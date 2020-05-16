@@ -43,7 +43,6 @@ import android.hardware.fingerprint.Fingerprint;
 import android.hardware.fingerprint.FingerprintManager;
 import android.hardware.fingerprint.FingerprintManager.RemovalCallback;
 import android.os.Bundle;
-import android.os.SystemProperties;
 import android.os.UserHandle;
 import android.os.UserManager;
 import android.os.storage.StorageManager;
@@ -79,6 +78,8 @@ import com.android.settingslib.widget.FooterPreference;
 import com.android.settingslib.widget.FooterPreferenceMixinCompat;
 
 import java.util.List;
+
+import com.android.internal.util.custom.faceunlock.FaceUnlockUtils;
 
 public class ChooseLockGeneric extends SettingsActivity {
     public static final String CONFIRM_CREDENTIALS = "confirm_credentials";
@@ -881,7 +882,7 @@ public class ChooseLockGeneric extends SettingsActivity {
         private void removeAllFaceForUserAndFinish(final int userId, RemovalTracker tracker) {
             if (mFaceManager != null && mFaceManager.isHardwareDetected()) {
                 if (mFaceManager.hasEnrolledTemplates(userId)) {
-                    FaceManager.RemovalCallback removalCallback =
+                FaceManager.RemovalCallback removalCallback =
                             new FaceManager.RemovalCallback() {
                         @Override
                         public void onRemovalError(Face face, int errMsgId, CharSequence err) {
@@ -895,9 +896,7 @@ public class ChooseLockGeneric extends SettingsActivity {
                             }
                         }
                     };
-
-                    boolean senseEnabled = SystemProperties.getBoolean("ro.face.sense_service", false);
-                    if (senseEnabled){
+                    if (FaceUnlockUtils.hasMotoFaceUnlock()){
                         final List<Face> faces = mFaceManager.getEnrolledFaces(userId);
                         if (!faces.isEmpty()) {
                             mFaceManager.remove(faces.get(0), userId, removalCallback);
@@ -907,10 +906,6 @@ public class ChooseLockGeneric extends SettingsActivity {
                     mFaceManager.setActiveUser(userId);
                     Face face = new Face(null, 0, 0);
                     mFaceManager.remove(face, userId, removalCallback);
-                } else {
-                    // No faces in this user, we may also want to delete managed profile faces
-                    removeManagedProfileFacesAndFinishIfNecessary(userId, tracker);
-                }
             } else {
                 tracker.onFaceDone();
             }
