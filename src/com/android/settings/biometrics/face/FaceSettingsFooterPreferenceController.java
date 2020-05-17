@@ -62,7 +62,7 @@ public class FaceSettingsFooterPreferenceController extends BasePreferenceContro
         final AnnotationSpan.LinkInfo linkInfo =
                 new AnnotationSpan.LinkInfo(mContext, ANNOTATION_URL, helpIntent);
 
-        final int footerRes = mProvider.isAttentionSupported(mContext)
+        int footerRes = mProvider.isAttentionSupported(mContext)
                 ? R.string.security_settings_face_settings_footer
                 : R.string.security_settings_face_settings_footer_attention_not_supported;
 

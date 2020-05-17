@@ -906,6 +906,10 @@ public class ChooseLockGeneric extends SettingsActivity {
                     mFaceManager.setActiveUser(userId);
                     Face face = new Face(null, 0, 0);
                     mFaceManager.remove(face, userId, removalCallback);
+                } else {
+                    // No faces in this user, we may also want to delete managed profile faces
+                    removeManagedProfileFacesAndFinishIfNecessary(userId, tracker);
+                }
             } else {
                 tracker.onFaceDone();
             }
